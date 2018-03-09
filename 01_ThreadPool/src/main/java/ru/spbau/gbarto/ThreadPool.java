@@ -75,14 +75,29 @@ class ThreadPool<T> {
 
         @Override
         public void run() {
-            while (!Thread.interrupted()) {
-                Task task;
-                synchronized (ThreadPool.this) {
-                    if (queue.isEmpty()) {
-                        continue;
+            while (!Thread.currentThread().isInterrupted()) {
+                Task task = null;
+                while (!Thread.currentThread().isInterrupted()) {
+                    while (queue.isEmpty() && !Thread.currentThread().isInterrupted()) {
+                        Thread.yield();
                     }
-                    task = queue.remove();
+
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+
+                    synchronized (ThreadPool.this) {
+                        if (!queue.isEmpty()) {
+                            task = queue.remove();
+                            break;
+                        }
+                    }
                 }
+
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+
                 task.run();
             }
         }
