@@ -10,6 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * Wrapper for File. Makes it convenient to calculate MD5.
+ */
 class MD5File {
     private String path;
     private File file;
@@ -28,6 +31,11 @@ class MD5File {
         return file.isDirectory();
     }
 
+    /**
+     * Returns sorted in lexicographical order files.
+     *
+     * @return sorted in lexicographical order files.
+     */
     File[] listFiles() {
         File[] files = file.listFiles();
         Arrays.sort(files, (Comparator) (f1, f2) -> ((File) f1).getName().compareTo(((File) f2).getName()));
@@ -38,6 +46,12 @@ class MD5File {
         return file.getName();
     }
 
+    /**
+     * Returns MD5 of String.
+     *
+     * @param str string to calculate MD5
+     * @return MD5 of String.
+     */
     static String getMD5byString(String str) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -49,6 +63,11 @@ class MD5File {
         }
     }
 
+    /**
+     * Returns MD5 of content of file.
+     *
+     * @return MD5 of content of file.
+     */
     private String getMD5byContent() {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -60,6 +79,11 @@ class MD5File {
         }
     }
 
+    /**
+     * Recursively computes MD5 of directory/file.
+     *
+     * @return MD5 of directory/file.
+     */
     String getMD5() {
         if (!isDirectory()) {
             return getMD5byContent();

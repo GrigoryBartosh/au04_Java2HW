@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 
+/**
+ * Task for ForkJoinPool.
+ */
 public class FScanner extends RecursiveTask<String> {
     private final MD5File file;
 
@@ -12,6 +15,12 @@ public class FScanner extends RecursiveTask<String> {
         this.file = file;
     }
 
+    /**
+     * Calculates MD5.
+     * Combines the results of child's tasks. Then calculates MD5.
+     *
+     * @return calculated MD5.
+     */
     @Override
     protected String compute() {
         if (!file.isDirectory()) {
