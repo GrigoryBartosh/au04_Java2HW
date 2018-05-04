@@ -3,13 +3,20 @@ package ru.spbau.gbarto;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
 
+/**
+ * Server. Allows you to receive and respond to requests on the network.
+ */
 public class Server implements Runnable {
     private int portNumber;
 
+    /**
+     * Interacts with a particular client.
+     */
     private class Worker implements Runnable{
         private static final int BUFFER_SIZE = 4096;
 
@@ -19,6 +26,13 @@ public class Server implements Runnable {
             this.socket = socket;
         }
 
+        /**
+         * Reads String transmitted over the network.
+         *
+         * @param input stream of clients data
+         * @return the read String
+         * @throws IOException if any error occurred while reading String
+         */
         private String readString(DataInputStream input) throws IOException {
             StringBuilder string = new StringBuilder();
 
@@ -30,6 +44,13 @@ public class Server implements Runnable {
             return string.toString();
         }
 
+        /**
+         * Sends list of files in the directory.
+         *
+         * @param output stream to write data
+         * @param path to the directory
+         * @throws IOException if any error occurred while writing data
+         */
         private void sendList(DataOutputStream output, String path) throws IOException {
             File file = new File(path);
 
@@ -41,17 +62,28 @@ public class Server implements Runnable {
 
                 Arrays.sort(list, Comparator.comparing(File::getName));
 
-                output.writeInt(list.length);
-
+                StringBuilder string = new StringBuilder();
                 for (File children : list) {
-                    output.write(children.getPath().getBytes());
-                    output.writeBoolean(children.isDirectory());
+                    string.append(children.getPath());
+                    string.append(' ');
+                    string.append(children.isDirectory());
+                    string.append('\n');
                 }
+
+                output.writeInt(list.length);
+                output.write(string.toString().getBytes());
             } else {
                 output.writeInt(0);
             }
         }
 
+        /**
+         * Sends File by the path.
+         *
+         * @param output stream to write data
+         * @param path to the file
+         * @throws IOException if any error occurred while writing data
+         */
         private void sendFile(DataOutputStream output, String path) throws IOException {
             File file = new File(path);
 
@@ -69,6 +101,9 @@ public class Server implements Runnable {
             }
         }
 
+        /**
+         * Runs process of communication with client.
+         */
         @Override
         public void run() {
             try (DataInputStream input = new DataInputStream(socket.getInputStream());
@@ -85,31 +120,50 @@ public class Server implements Runnable {
                 }
 
                 output.flush();
+                socket.close();
             } catch (IOException e) {
                 System.err.println("error with socket operation");
             }
         }
     }
 
-    private Server(int portNumber) {
+    /**
+     * Constructs the Server.
+     *
+     * @param portNumber number of port for listening
+     */
+    public Server(int portNumber) {
         this.portNumber = portNumber;
     }
 
+    /**
+     * Runs server on the specified port and listens for connections.
+     */
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
-            while (!Thread.interrupted()) {
-                Socket socket = serverSocket.accept();
+            serverSocket.setSoTimeout(2000);
 
-                Thread communication = new Thread(new Worker(socket));
-                communication.setDaemon(false);
-                communication.start();
+            while (!Thread.interrupted()) {
+                try {
+                    Socket socket = serverSocket.accept();
+                    Thread communication = new Thread(new Worker(socket));
+                    communication.setDaemon(false);
+                    communication.start();
+                } catch (SocketTimeoutException ignored) {
+                }
             }
         } catch (IOException e) {
             System.err.println("error while creating the server");
         }
     }
 
+    /**
+     * Runs server on the specified port.
+     * Allows you to stop server.
+     *
+     * @param args list of arguments
+     */
     public static void main(String args[]) {
         int portNumber = Integer.parseInt(args[0]);
 
