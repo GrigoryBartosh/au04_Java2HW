@@ -5,16 +5,15 @@ workspace.xml
 tasks.xml
 .gradle
 build/
+out/priduction
 **/.idea/libraries/
 *.ctxt
 .mtj.tmp/
-*.jar
 *.war
 *.ear
 *.zip
 *.tar.gz
 *.rar
 
-papers/
 
-experemental/
+papers/
