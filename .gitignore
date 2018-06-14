@@ -1,11 +1,6 @@
 *~
 *.class
 *.log
-workspace.xml
-tasks.xml
-.gradle
-build/
-**/.idea/libraries/
 *.ctxt
 .mtj.tmp/
 *.jar
@@ -14,6 +9,14 @@ build/
 *.zip
 *.tar.gz
 *.rar
+
+**/.gradle/
+**/.idea/tasks.xml
+**/.idea/workspace.xml
+**/.idea/libraries
+**/build/
+**/out/
+*~
 
 papers/
 
