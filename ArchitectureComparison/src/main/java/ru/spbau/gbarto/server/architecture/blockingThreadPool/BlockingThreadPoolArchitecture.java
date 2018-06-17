@@ -29,18 +29,15 @@ public class BlockingThreadPoolArchitecture extends Server {
     }
 
     private void waitExecutor(ExecutorService executor) {
-        try {
-            while (true) {
+        executor.shutdown();
+
+        while (true) {
+            try {
                 if (executor.awaitTermination(WAIT_TTS, TimeUnit.MILLISECONDS)) {
                     break;
                 }
-            }
-        } catch (InterruptedException ignored) { }
-    }
-
-    private void waitThreadPool(ExecutorService threadPool) {
-        threadPool.shutdown();
-        waitExecutor(threadPool);
+            } catch (InterruptedException ignored) { }
+        }
     }
 
     private void waitSenders(ExecutorService[] senders) {
@@ -54,7 +51,7 @@ public class BlockingThreadPoolArchitecture extends Server {
             metrics.add(m);
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             metrics.get(i).div(m);
         }
     }
@@ -70,7 +67,6 @@ public class BlockingThreadPoolArchitecture extends Server {
             ready = true;
             for (int i = 0; i < m; i++) {
                 allMetrics[i] = new AllMetrics();
-                allMetrics[i].request.start();
                 senders[i] = Executors.newSingleThreadExecutor();
 
                 Socket socket = serverSocket.accept();
@@ -82,11 +78,11 @@ public class BlockingThreadPoolArchitecture extends Server {
             }
 
             waitThreads(threads);
-            waitThreadPool(threadPool);
+            waitExecutor(threadPool);
             waitSenders(senders);
             collectMetrics(allMetrics);
         } catch (IOException e) {
-            System.err.println("BlockingThreadPoolArchitecture: Failed to accept settings from server");
+            System.err.println("BlockingThreadPoolArchitecture: Error creating server");
             System.exit(1);
         }
     }

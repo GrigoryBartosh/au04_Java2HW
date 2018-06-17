@@ -1,9 +1,11 @@
 package ru.spbau.gbarto.server.architecture;
 
+import ru.spbau.gbarto.Metric;
+
 public class AllMetrics {
     public Metric requestProcessing = new Metric();
     public Metric clientOnTheServer = new Metric();
-    public Metric request = new Metric();
+    Metric request = new Metric();
 
     public void add(AllMetrics other) {
         requestProcessing.add(other.requestProcessing);

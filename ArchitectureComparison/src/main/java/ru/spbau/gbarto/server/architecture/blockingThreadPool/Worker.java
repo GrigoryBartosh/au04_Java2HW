@@ -2,7 +2,7 @@ package ru.spbau.gbarto.server.architecture.blockingThreadPool;
 
 import ru.spbau.gbarto.server.architecture.Algorithm;
 import ru.spbau.gbarto.server.architecture.AllMetrics;
-import ru.spbau.gbarto.server.architecture.Metric;
+import ru.spbau.gbarto.Metric;
 
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -31,7 +31,7 @@ public class Worker implements Runnable {
     public void run() {
         metrics.requestProcessing.add((double) Algorithm.sort(array));
 
-        Writer writer = new Writer(socket, array, metrics, clientOnTheServer, x, stepNumber, sender);
+        Writer writer = new Writer(socket, array, metrics, clientOnTheServer, x, stepNumber);
         sender.submit(writer);
     }
 }

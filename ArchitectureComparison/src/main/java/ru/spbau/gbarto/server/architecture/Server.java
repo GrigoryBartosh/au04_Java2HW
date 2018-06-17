@@ -18,6 +18,10 @@ public abstract class Server implements Runnable {
         return ready;
     }
 
+    public void setMetricRequest(double val) {
+        metrics.request.set(val);
+    }
+
     public double[] getMetrics() {
         return metrics.toArray();
     }

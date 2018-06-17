@@ -1,6 +1,7 @@
 package ru.spbau.gbarto.client;
 
 import ru.spbau.gbarto.Serializer;
+import ru.spbau.gbarto.Metric;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,12 +16,16 @@ public class Client implements Runnable {
     private int delta;
     private int x;
 
+    private Metric metricRequest;
+
     public Client(String host, int port, int n, int delta, int x) {
         this.host = host;
         this.port = port;
         this.n = n;
         this.delta = delta;
         this.x = x;
+
+        metricRequest = new Metric();
     }
 
     private int[] generateArray() {
@@ -56,11 +61,13 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
+        metricRequest.start();
+
         while (true) {
             try (Socket socket = new Socket(host, port)) {
                 try (DataInputStream input = new DataInputStream(socket.getInputStream());
                      DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
-                    while (x > 0) {
+                    for (int i = 0; i < x; i++) {
                         int[] array = generateArray();
 
                         Serializer.writeArray(output, array);
@@ -72,10 +79,10 @@ public class Client implements Runnable {
                             throw new IOException();
                         }
 
-                        x--;
                         sleep();
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
                     System.err.println("Error working with server");
                     System.exit(1);
                 }
@@ -83,5 +90,12 @@ public class Client implements Runnable {
                 break;
             } catch (IOException ignored) { }
         }
+
+        metricRequest.stop();
+        metricRequest.div(x);
+    }
+
+    Metric getMetric() {
+        return metricRequest;
     }
 }

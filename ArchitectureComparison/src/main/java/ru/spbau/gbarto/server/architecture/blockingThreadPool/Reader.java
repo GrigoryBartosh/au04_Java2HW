@@ -2,10 +2,9 @@ package ru.spbau.gbarto.server.architecture.blockingThreadPool;
 
 import ru.spbau.gbarto.Serializer;
 import ru.spbau.gbarto.server.architecture.AllMetrics;
-import ru.spbau.gbarto.server.architecture.Metric;
+import ru.spbau.gbarto.Metric;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;

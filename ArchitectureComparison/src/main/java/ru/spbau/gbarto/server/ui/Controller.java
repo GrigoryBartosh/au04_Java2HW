@@ -14,8 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbau.gbarto.server.architecture.Server;
 import ru.spbau.gbarto.server.architecture.blocking.BlockingArchitecture;
 import ru.spbau.gbarto.server.architecture.blockingThreadPool.BlockingThreadPoolArchitecture;
+import ru.spbau.gbarto.server.architecture.nonBlocking.NonBlockingArchitecture;
 
 import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +26,18 @@ import java.util.Properties;
 public class Controller {
     private static final int WAIT_SERVER_TTS = 10;
 
-    private static final String DEFAULT_N = "1000";
+    private static final String DEFAULT_N = "2000";
     private static final String DEFAULT_N_FROM = "100";
-    private static final String DEFAULT_N_TO = "1000";
-    private static final String DEFAULT_N_STEP = "10";
-    private static final String DEFAULT_M = "100";
+    private static final String DEFAULT_N_TO = "5000";
+    private static final String DEFAULT_N_STEP = "100";
+    private static final String DEFAULT_M = "10";
     private static final String DEFAULT_M_FROM = "1";
-    private static final String DEFAULT_M_TO = "100";
+    private static final String DEFAULT_M_TO = "25";
     private static final String DEFAULT_M_STEP = "1";
     private static final String DEFAULT_dT = "0";
     private static final String DEFAULT_dT_FROM = "0";
-    private static final String DEFAULT_dT_TO = "20";
-    private static final String DEFAULT_dT_STEP = "1";
+    private static final String DEFAULT_dT_TO = "100";
+    private static final String DEFAULT_dT_STEP = "5";
 
     private static final String FOLDER = "results";
 
@@ -116,6 +118,8 @@ public class Controller {
                 fieldParameter2.setText(DEFAULT_M);
                 break;
         }
+
+        showGraph();
     }
 
     private void notifyUser(String s) {
@@ -154,8 +158,8 @@ public class Controller {
             case "Blocking (ThreadPool)":
                 return new BlockingThreadPoolArchitecture(SERVER_PORT, parameterSet[1], x);
 
-            default:                         //"Non-Blocking"
-                return null;
+            default:                                                                  //"Non-Blocking"
+                return new NonBlockingArchitecture(SERVER_PORT, parameterSet[1], x);
         }
     }
 
@@ -185,6 +189,29 @@ public class Controller {
         }
     }
 
+    private double waitMetricRequest() {
+        double metricRequest = 0;
+        try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
+            Socket socket = serverSocket.accept();
+
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+
+            metricRequest = input.readDouble();
+
+            output.writeInt(0);
+
+            output.flush();
+            socket.shutdownOutput();
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Failed to accept metric request from client");
+            System.exit(1);
+        }
+
+        return metricRequest;
+    }
+
     private void runServer(Server server, int[] parameterSet, int x) {
         Thread threadServer = new Thread(server);
         threadServer.setDaemon(false);
@@ -203,6 +230,9 @@ public class Controller {
                 threadServer.join();
             } catch (InterruptedException ignored) { }
         }
+
+        double metricRequest = waitMetricRequest();
+        server.setMetricRequest(metricRequest);
     }
 
     @FXML
@@ -245,11 +275,12 @@ public class Controller {
                 metrics.get(i).add(nextMetrics[i]);
             }
 
-            notifyUser("Done: " + (stepNum+1) + " of " + cnt);
+            notifyUser(architecture + ", parameter: " + parameterName + ", Done: " + (stepNum+1) + " of " + cnt);
         }
         notifyUser("Done");
 
         metrics.forEach(MetricsList::save);
+        rebuildGraphs();
         showGraph();
     }
 
@@ -280,19 +311,17 @@ public class Controller {
         }
     }
 
-    private void showCurrentGraph() {
+    @FXML
+    public void showGraph() {
         String architecture = choiceArchitecture.getValue().toString();
         String parameterName = choiceParameter.getValue().toString();
         String metricsName = choiceMetric.getValue().toString();
 
         String name = "file:" + FOLDER + "/" + architecture + "_" + parameterName + "_" + metricsName + ".png";
         Image image = new Image(name);
+        if (image.isError()) {
+            image = new Image("emptyGraph.png");
+        }
         imageView.setImage(image);
-    }
-
-    @FXML
-    public void showGraph() {
-        rebuildGraphs();
-        showCurrentGraph();
     }
 }

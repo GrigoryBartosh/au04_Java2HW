@@ -20,7 +20,7 @@
     <GridPane hgap="5.0" vgap="5.0">
         <Label text="Architecture:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
 
-        <ChoiceBox fx:id="choiceArchitecture" value="Blocking" GridPane.columnIndex="1" GridPane.rowIndex="0">
+        <ChoiceBox fx:id="choiceArchitecture" onAction="#showGraph" value="Blocking" GridPane.columnIndex="1" GridPane.rowIndex="0">
             <items>
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="Blocking" />
@@ -32,7 +32,7 @@
 
         <Label text="X:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
-        <TextField fx:id="fieldX" text="2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <TextField fx:id="fieldX" text="10" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
         <Label text="Variable:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
 
@@ -49,15 +49,15 @@
         <GridPane hgap="5.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
             <Label text="from:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
 
-            <TextField fx:id="fieldFrom" text="10" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <TextField fx:id="fieldFrom" text="100" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
             <Label text="to:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 
-            <TextField fx:id="fieldTo" text="10" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="fieldTo" text="5000" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
             <Label text="step:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
 
-            <TextField fx:id="fieldStep" text="10" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="fieldStep" text="100" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          <columnConstraints>
             <ColumnConstraints />
             <ColumnConstraints />
@@ -71,7 +71,7 @@
 
         <Label fx:id="labelParameter1" text="M:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
 
-        <TextField fx:id="fieldParameter1" text="1" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <TextField fx:id="fieldParameter1" text="10" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
         <Label fx:id="labelParameter2" text="dT:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
 

@@ -26,7 +26,7 @@ public class BlockingArchitecture extends Server{
             metrics.add(w.getMetrics());
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             metrics.get(i).div(m);
         }
     }

@@ -1,11 +1,15 @@
-package ru.spbau.gbarto.server.architecture;
+package ru.spbau.gbarto;
 
 public class Metric {
-    private double val = 0;
     private long time = 0;
+    private double val = 0;
 
     public synchronized void start() {
         time = System.currentTimeMillis();
+    }
+
+    public synchronized void set(double val) {
+        this.val = val;
     }
 
     public synchronized void stop() {
@@ -24,7 +28,7 @@ public class Metric {
         val /= n;
     }
 
-    double get() {
+    public synchronized double get() {
         return val;
     }
 }

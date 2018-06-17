@@ -3,7 +3,7 @@ package ru.spbau.gbarto.server.architecture.blocking;
 import ru.spbau.gbarto.Serializer;
 import ru.spbau.gbarto.server.architecture.Algorithm;
 import ru.spbau.gbarto.server.architecture.AllMetrics;
-import ru.spbau.gbarto.server.architecture.Metric;
+import ru.spbau.gbarto.Metric;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,8 +19,6 @@ public class Worker implements Runnable {
     Worker(Socket socket, int x) {
         this.socket = socket;
         this.x = x;
-
-        metrics.request.start();
     }
 
     @Override
@@ -41,14 +39,14 @@ public class Worker implements Runnable {
                 Serializer.writeArray(output, array);
                 output.flush();
             }
+
+            socket.close();
         } catch (IOException e) {
-            System.err.println("BlockingArchitecture: Error working with client");
+            System.err.println("BlockingArchitecture: Worker: Error working with client");
             System.exit(1);
         }
 
-        metrics.request.stop();
-
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             metrics.get(i).div(x);
         }
     }
