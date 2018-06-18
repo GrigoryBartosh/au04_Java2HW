@@ -26,9 +26,9 @@ import java.util.Properties;
 public class Controller {
     private static final int WAIT_SERVER_TTS = 10;
 
-    private static final String DEFAULT_N = "2000";
+    private static final String DEFAULT_N = "10000";
     private static final String DEFAULT_N_FROM = "100";
-    private static final String DEFAULT_N_TO = "5000";
+    private static final String DEFAULT_N_TO = "10000";
     private static final String DEFAULT_N_STEP = "100";
     private static final String DEFAULT_M = "10";
     private static final String DEFAULT_M_FROM = "1";
