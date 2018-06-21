@@ -37,27 +37,26 @@ class ServerTest {
 
     @Test
     void testList() throws InterruptedException {
-        String request = "1 src/test/resources";
+        String request = "1 src" + File.separator + "test" + File.separator + "resources";
 
         ByteArrayInputStream input = new ByteArrayInputStream(request.getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         new Client(hostName, portNumber, input, output).run();
 
-        String ans =    "6\n" +
-                        "src/test/resources/empty true\n" +
-                        "src/test/resources/empty.txt false\n" +
-                        "src/test/resources/file.txt false\n" +
-                        "src/test/resources/not_empty.txt false\n" +
-                        "src/test/resources/singleFileFolder true\n" +
-                        "src/test/resources/someTree true";
+        String ans =    "5\n" +
+                        "src" + File.separator + "test" + File.separator + "resources" + File.separator + "empty.txt false\n" +
+                        "src" + File.separator + "test" + File.separator + "resources" + File.separator + "file.txt false\n" +
+                        "src" + File.separator + "test" + File.separator + "resources" + File.separator + "not_empty.txt false\n" +
+                        "src" + File.separator + "test" + File.separator + "resources" + File.separator + "singleFileFolder true\n" +
+                        "src" + File.separator + "test" + File.separator + "resources" + File.separator + "someTree true";
 
         assertEquals(ans.trim(), output.toString().trim());
     }
 
     @Test
     void testGetFile() throws IOException {
-        String request = "2 src/test/resources/file.txt";
+        String request = "2 src" + File.separator + "test" + File.separator + "resources" + File.separator + "file.txt";
 
         ByteArrayInputStream input = new ByteArrayInputStream(request.getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -66,7 +65,7 @@ class ServerTest {
 
         assertTrue(new File("file.txt").exists());
         assertTrue(FileUtils.contentEquals(new File("file.txt"),
-                new File("src/test/resources/file.txt")));
+                new File("src" + File.separator + "test" + File.separator + "resources" + File.separator + "file.txt")));
 
         assertTrue(new File("file.txt").delete());
     }

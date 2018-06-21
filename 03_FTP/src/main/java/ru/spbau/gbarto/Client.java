@@ -50,19 +50,21 @@ public class Client implements Runnable {
         output.println(size);
         output.println(list.toString());
     }
+
     /**
      * Gets File by the path.
      *
      * @param dataInput stream to read data
-     * @param filename name of file
+     * @param path path to the file
      * @throws IOException if any error occurred while reading data
      */
-    private void getFile(DataInputStream dataInput, String filename) throws IOException {
+    private void getFile(DataInputStream dataInput, String path) throws IOException {
         long size = dataInput.readLong();
         if (size == 0) {
             return;
         }
 
+        String filename = new File(path).getName();
         try (DataOutputStream dataOutput = new DataOutputStream(new FileOutputStream(new File(filename)))) {
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int read = dataInput.read(buffer); read != -1; read = dataInput.read(buffer)) {
@@ -93,8 +95,7 @@ public class Client implements Runnable {
                     getList(dataInput);
                     break;
                 case 2:
-                    String filename = new File(path).getName();
-                    getFile(dataInput, filename);
+                    getFile(dataInput, path);
                     break;
             }
         } catch (IOException e) {
@@ -126,8 +127,20 @@ public class Client implements Runnable {
      * @param args list of arguments
      */
     public static void main(String args[]) {
+        if (args.length != 2) {
+            System.err.println("Not enough arguments");
+            System.exit(1);
+        }
+
         String hostName = args[0];
-        int portName = Integer.parseInt(args[1]);
+        int portName = 0;
+        try {
+            portName = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            System.err.println("Incorrect input data");
+            System.exit(1);
+        }
+
 
         new Client(hostName, portName, System.in, System.out).run();
     }
