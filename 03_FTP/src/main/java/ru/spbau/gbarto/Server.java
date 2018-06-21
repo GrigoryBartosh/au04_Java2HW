@@ -165,7 +165,18 @@ public class Server implements Runnable {
      * @param args list of arguments
      */
     public static void main(String args[]) {
-        int portNumber = Integer.parseInt(args[0]);
+        if (args.length < 1) {
+            System.err.println("Not enough arguments");
+            System.exit(1);
+        }
+
+        int portNumber = 0;
+        try {
+            portNumber = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            System.err.println("Incorrect input data");
+            System.exit(1);
+        }
 
         Thread thread = new Thread(new Server(portNumber));
         thread.setDaemon(false);
