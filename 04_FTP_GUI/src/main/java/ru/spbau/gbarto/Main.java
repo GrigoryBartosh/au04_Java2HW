@@ -10,10 +10,27 @@ import javafx.stage.Stage;
  * Applications main class.
  * Allows you to go to view and download files.
  */
-public class Main extends Application{
-    static String hostName;
-    static int portNumber;
-    static Stage primaryStage;
+public class Main extends Application {
+    private static String hostName;
+    private static int portNumber;
+    private static Stage primaryStage;
+
+    static String getHostName() {
+        return hostName;
+    }
+
+    static int getPortNumber() {
+        return portNumber;
+    }
+
+    /**
+     * Updates title of primaryStage.
+     *
+     * @param str new title.
+     */
+    static void updateTitle(String str) {
+        primaryStage.setTitle(str);
+    }
 
     /**
      * Starts the application.
@@ -44,8 +61,8 @@ public class Main extends Application{
             System.exit(1);
         }
 
-        String hostName = args[0];
-        int portNumber = 0;
+        hostName = args[0];
+        portNumber = 0;
         try {
             portNumber = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {

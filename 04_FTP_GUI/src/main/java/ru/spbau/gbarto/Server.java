@@ -172,7 +172,7 @@ public class Server implements Runnable {
 
         int portNumber = 0;
         try {
-            portNumber = Integer.parseInt(args[1]);
+            portNumber = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
             System.err.println("Incorrect input data");
             System.exit(1);

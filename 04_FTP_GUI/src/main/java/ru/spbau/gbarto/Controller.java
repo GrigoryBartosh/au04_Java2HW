@@ -17,6 +17,9 @@ import java.util.Arrays;
 public class Controller {
     private static final String START_PATH = ".";
 
+    private static String hostName;
+    private static int portNumber;
+
     @FXML private TableView tableView;
 
     private String currentPath = START_PATH;
@@ -63,7 +66,7 @@ public class Controller {
     private ByteArrayOutputStream processRequest(String request) {
         ByteArrayInputStream input = new ByteArrayInputStream(request.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new Client(Main.hostName, Main.portNumber, input, output).run();
+        new Client(hostName, portNumber, input, output).run();
         return output;
     }
 
@@ -103,15 +106,6 @@ public class Controller {
     }
 
     /**
-     * Updates title of primaryStage.
-     *
-     * @param str new title.
-     */
-    private void updateTitle(String str) {
-        Main.primaryStage.setTitle(str);
-    }
-
-    /**
      * Processes a list request.
      *
      * @param pressedName name of selected folder
@@ -123,7 +117,7 @@ public class Controller {
         TableFile[] files = constructTableFiles(output);
         updateTableView(files);
 
-        updateTitle(currentPath);
+        Main.updateTitle(currentPath);
     }
 
     /**
@@ -134,7 +128,7 @@ public class Controller {
     private void getFile(String pressedName) {
         String name = Paths.get(currentPath, pressedName).toString();
         processRequest("2 " + name + "\nexit");
-        updateTitle("file " + name + " was downloaded");
+        Main.updateTitle("file " + name + " was downloaded");
     }
 
     /**
@@ -142,6 +136,9 @@ public class Controller {
      */
     @FXML
     public void initialize() {
+        hostName = Main.getHostName();
+        portNumber = Main.getPortNumber();
+
         getList(currentPath);
     }
 
