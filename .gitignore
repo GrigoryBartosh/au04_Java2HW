@@ -8,7 +8,6 @@ build/
 **/.idea/libraries/
 *.ctxt
 .mtj.tmp/
-*.jar
 *.war
 *.ear
 *.zip
