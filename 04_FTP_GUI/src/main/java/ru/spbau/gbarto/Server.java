@@ -67,7 +67,7 @@ public class Server implements Runnable {
                     string.append(children.getPath());
                     string.append(' ');
                     string.append(children.isDirectory());
-                    string.append('\n');
+                    string.append(System.lineSeparator());
                 }
 
                 output.writeInt(list.length);

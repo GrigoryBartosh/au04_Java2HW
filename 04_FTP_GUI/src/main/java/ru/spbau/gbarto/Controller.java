@@ -119,7 +119,7 @@ public class Controller {
     private void getList(String pressedName) {
         updateCurrentPath(pressedName);
 
-        ByteArrayOutputStream output = processRequest("1 " + currentPath + "\nexit", null);
+        ByteArrayOutputStream output = processRequest("1 " + currentPath + System.lineSeparator() + "exit", null);
         TableFile[] files = constructTableFiles(output);
         updateTableView(files);
 
@@ -139,7 +139,7 @@ public class Controller {
         File file = fileChooser.showSaveDialog(Main.getPrimaryStage());
 
         String name = Paths.get(currentPath, pressedName).toString();
-        processRequest("2 " + name + "\nexit", file);
+        processRequest("2 " + name + System.lineSeparator() + "exit", file);
         Main.updateTitle("file " + name + " was downloaded");
     }
 
