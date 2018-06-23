@@ -1,5 +1,6 @@
 package ru.spbau.gbarto.logic;
 
+import ru.spbau.gbarto.Cell;
 import ru.spbau.gbarto.log.Logger;
 
 import java.util.ArrayList;
@@ -26,21 +27,25 @@ public class GameWithBotEasy extends Game {
     }
 
     @Override
-    public void makeMove(int x, int y) {
+    public Cell makeMove(int x, int y) {
         super.makeMove(x, y);
 
         if (!getState().equals(GameState.PROCESS)) {
-            return;
+            return null;
         }
 
+        Cell ans = null;
         Collections.shuffle(cells);
         for (Cell p : cells) {
             int tx = p.getX();
             int ty = p.getY();
             if (getCellState(tx, ty).equals(CellState.EMPTY)) {
                 super.makeMove(tx, ty);
+                ans = new Cell(tx, ty);
                 break;
             }
         }
+
+        return ans;
     }
 }

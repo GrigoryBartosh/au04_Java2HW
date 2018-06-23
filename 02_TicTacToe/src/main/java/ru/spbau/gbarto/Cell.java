@@ -1,19 +1,19 @@
-package ru.spbau.gbarto.logic;
+package ru.spbau.gbarto;
 
-class Cell {
+public class Cell {
     private int x;
     private int y;
 
-    Cell (int x, int y) {
+    public Cell (int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    int getX() {
+    public int getX() {
         return x;
     }
 
-    int getY() {
+    public int getY() {
         return y;
     }
 }

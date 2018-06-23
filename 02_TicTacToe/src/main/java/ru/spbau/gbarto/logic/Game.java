@@ -1,5 +1,6 @@
 package ru.spbau.gbarto.logic;
 
+import ru.spbau.gbarto.Cell;
 import ru.spbau.gbarto.log.Logger;
 
 public class Game {
@@ -87,13 +88,13 @@ public class Game {
         field[x][y] = cellState;
     }
 
-    public void makeMove(int x, int y) {
+    public Cell makeMove(int x, int y) {
         if (!state.equals(GameState.PROCESS)) {
-            return;
+            return null;
         }
 
         if (!field[x][y].equals(CellState.EMPTY)) {
-            return;
+            return null;
         }
 
         field[x][y] = xTurn ? CellState.IS_X : CellState.IS_O;
@@ -111,5 +112,7 @@ public class Game {
                 logger.add(gameType, "draw");
                 break;
         }
+
+        return new Cell(x, y);
     }
 }

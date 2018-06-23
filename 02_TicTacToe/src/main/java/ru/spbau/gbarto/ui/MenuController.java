@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ru.spbau.gbarto.log.Logger;
 import ru.spbau.gbarto.logic.GameWithBotEasy;

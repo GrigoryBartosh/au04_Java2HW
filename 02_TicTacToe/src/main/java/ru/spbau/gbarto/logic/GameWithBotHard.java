@@ -1,5 +1,6 @@
 package ru.spbau.gbarto.logic;
 
+import ru.spbau.gbarto.Cell;
 import ru.spbau.gbarto.log.Logger;
 
 public class GameWithBotHard extends Game {
@@ -61,18 +62,20 @@ public class GameWithBotHard extends Game {
     }
 
     @Override
-    public void makeMove(int x, int y) {
+    public Cell makeMove(int x, int y) {
         super.makeMove(x, y);
 
         if (!getState().equals(GameState.PROCESS)) {
-            return;
+            return null;
         }
 
-        Cell p = getWay();
-        if (p == null) {
+        Cell ans = getWay();
+        if (ans == null) {
             throw new RuntimeException();
         }
 
-        super.makeMove(p.getX(), p.getY());
+        super.makeMove(ans.getX(), ans.getY());
+
+        return ans;
     }
 }
