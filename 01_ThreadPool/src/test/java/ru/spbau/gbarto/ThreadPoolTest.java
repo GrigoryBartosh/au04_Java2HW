@@ -1,164 +1,23 @@
 package ru.spbau.gbarto;
 
-import static java.lang.Integer.min;
-import static java.lang.Integer.max;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
-
-class Tree {
-    private Integer[] tree;
-    private int size;
-    private int threads;
-
-    private static class Node {
-        private ThreadPool<Node> pool;
-        private Queue<LightFuture<Node>> queue;
-
-        private int v;
-        private int tl, tr;
-        private int l, r;
-        private int val;
-
-        private Node(ThreadPool<Node> pool, Queue<LightFuture<Node>> queue, int v, int tl, int tr, int l, int r, int val) {
-            this.pool = pool;
-            this.queue = queue;
-            this.v = v;
-            this.tl = tl;
-            this.tr = tr;
-            this.l = l;
-            this.r = r;
-            this.val = val;
-        }
-
-        private Node(Node other, int v, int tl, int tr, int l, int r) {
-            this.pool = other.pool;
-            this.queue = other.queue;
-            this.v = v;
-            this.tl = tl;
-            this.tr = tr;
-            this.l = l;
-            this.r = r;
-            this.val = other.val;
-        }
-    }
-
-    private void push(int v) {
-        if (tree[v] == null) {
-            return;
-        }
-
-        tree[2 * v] = tree[v];
-        tree[2 * v + 1] = tree[v];
-        tree[v] = null;
-    }
-
-    private Integer get(int v, int tl, int tr, int pos) {
-        if (tl == tr) {
-            return tree[v];
-        }
-
-        push(v);
-
-        int tm = (tl + tr) / 2;
-        if (pos <= tm) return get(2 * v, tl, tm, pos);
-        else           return get(2 * v + 1, tm + 1, tr, pos);
-    }
-
-    private Node setParallel(Node node) {
-        ThreadPool<Node> pool = node.pool;
-        int v = node.v;
-        int tl = node.tl;
-        int tr = node.tr;
-        int l = node.l;
-        int r = node.r;
-
-        if (l > r) {
-            return null;
-        }
-
-        if (l <= tl && tr <= r) {
-            tree[v] = node.val;
-            return null;
-        }
-
-        push(v);
-
-        int tm = (tl + tr) / 2;
-        LightFuture<Node> task1 = pool.addTask(() -> setParallel(new Node(node, 2 * v, tl, tm, l, min(tm, r))));
-        LightFuture<Node> task2 = pool.addTask(() -> setParallel(new Node(node, 2 * v + 1, tm+1, tr, max(l, tm + 1), r)));
-
-        Queue<LightFuture<Node>> queue = node.queue;
-        synchronized (queue) {
-            queue.add(task1);
-            queue.add(task2);
-        }
-
-        return null;
-    }
-
-    Tree(int size, int threads) {
-        this.size = size;
-        this.threads = threads;
-
-        tree = new Integer[4 * size];
-
-        set(0, size - 1, 0);
-    }
-
-    Integer get(int pos) {
-        return get(1, 0, size - 1, pos);
-    }
-
-    void set(int l, int r, int val) {
-        ThreadPool<Node> pool = new ThreadPool<>(threads);
-        Queue<LightFuture<Node>> queue = new LinkedList<>();
-
-        LightFuture<Node> task = pool.addTask(() -> setParallel(new Node(pool, queue, 1, 0, size - 1, l, r, val)));
-        synchronized (queue) {
-            queue.add(task);
-        }
-
-        while (!queue.isEmpty()) {
-            LightFuture<Node> t;
-            synchronized (queue) {
-                t = queue.remove();
-            }
-
-            try {
-                t.get();
-            } catch (LightFuture.LightExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    Integer[] getArray() {
-        Integer[] res = new Integer[size];
-        for (int i = 0; i < size; i++) {
-            res[i] = get(i);
-        }
-
-        return res;
-    }
-}
+import java.util.*;
 
 class ThreadPoolTest {
 
     @Test
-    void testSingleThreadSingleTask() throws LightFuture.LightExecutionException {
-        ThreadPool<Integer> pool = new ThreadPool<>(1);
+    void testSingleThreadSingleTask() throws LightExecutionException {
+        ThreadPool pool = new ThreadPool(1);
         LightFuture<Integer> task = pool.addTask(() -> 8800555);
         assertEquals(8800555, task.get().intValue());
         pool.shutdown();
     }
 
     @Test
-    void testSingleThreadMultiTask() throws LightFuture.LightExecutionException {
-        ThreadPool<Integer> pool = new ThreadPool<>(1);
+    void testSingleThreadMultiTask() throws LightExecutionException {
+        ThreadPool pool = new ThreadPool(1);
         LightFuture<Integer> task1 = pool.addTask(() -> 8);
         LightFuture<Integer> task2 = pool.addTask(() -> 800);
         LightFuture<Integer> task3 = pool.addTask(() -> 555);
@@ -175,8 +34,8 @@ class ThreadPoolTest {
     }
 
     @Test
-    void testMultiThreadMultiTask() throws LightFuture.LightExecutionException {
-        ThreadPool<Integer> pool = new ThreadPool<>(4);
+    void testMultiThreadMultiTask() throws LightExecutionException {
+        ThreadPool pool = new ThreadPool(4);
         LightFuture<Integer> task1 = pool.addTask(() -> 8);
         LightFuture<Integer> task2 = pool.addTask(() -> 800);
         LightFuture<Integer> task3 = pool.addTask(() -> 555);
@@ -193,48 +52,77 @@ class ThreadPoolTest {
     }
 
     @Test
-    void testThenApply() throws LightFuture.LightExecutionException {
-        ThreadPool<Integer> pool = new ThreadPool<>(4);
+    void testThenApply() throws LightExecutionException {
+        ThreadPool pool = new ThreadPool(4);
 
-        LightFuture<Integer>[] tasks = new LightFuture[10];
+        List<LightFuture<Integer>> tasks = new ArrayList<>();
 
-        tasks[0] = pool.addTask(() -> 1);
+        LightFuture<Integer> startTask = pool.addTask(() -> 1);
+        tasks.add(startTask);
         for (int i = 1; i < 10; i++) {
-            tasks[i] = tasks[i - 1].thenApply(x -> x * 2);
+            LightFuture<Integer> task = tasks.get(i - 1);
+            task = task.thenApply(x -> x * 2);
+            tasks.add(task);
         }
 
         for (int i = 0; i < 10; i++) {
-            assertEquals(((Double)Math.pow(2, i)).intValue(), tasks[i].get().intValue());
+            double expected = ((Double)Math.pow(2, i)).intValue();
+            double actual = (double) tasks.get(i).get();
+            assertEquals(expected, actual);
         }
 
         pool.shutdown();
+    }
+
+    @Test
+    void testMultiThreads() throws InterruptedException {
+        ThreadPool pool = new ThreadPool(4);
+
+        Thread[] threads = new Thread[10];
+        boolean[] results = new boolean[10];
+        for (int i = 0; i < 10; i++) {
+            final int threadNum = i;
+            threads[threadNum] = new Thread(() -> {
+                Random random = new Random();
+
+                List<LightFuture<Integer>> tasks = new ArrayList<>();
+                int[] val = new int[10];
+                for (int j = 0; j < 10; j++) {
+                    final int testNum = j;
+                    val[testNum] = random.nextInt();
+                    LightFuture<Integer> task = pool.addTask(() -> val[testNum] * val[testNum]);
+                    tasks.add(task);
+                }
+
+                for (int j = 0; j < 10; j++) {
+                    try {
+                        int expected = val[j] * val[j];
+                        assertEquals(expected, tasks.get(j).get().intValue());
+                    } catch (LightExecutionException ignored) {}
+                }
+
+                results[threadNum] = true;
+            });
+        }
+
+        for (int i = 0; i < 10; i++) {
+            threads[i].start();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            threads[i].join();
+            assertTrue(results[i]);
+        }
     }
 
     @Test
     void testLightExecutionException() {
-        ThreadPool<Integer> pool = new ThreadPool<>(1);
+        ThreadPool pool = new ThreadPool(1);
 
         LightFuture<Integer> task = pool.addTask(() -> {
             throw new RuntimeException();
         });
 
-        assertThrows(LightFuture.LightExecutionException.class, task::get);
-    }
-
-    @Test
-    void testMultiThreads() {
-        Tree tree = new Tree(11, 4);
-
-        tree.set(0, 1, 8);
-        tree.set(2, 3, 0);
-        tree.set(4, 6, 5);
-        tree.set(7, 7, 3);
-        tree.set(8, 8, 5);
-        tree.set(9, 9, 3);
-        tree.set(10, 10, 5);
-
-        Integer[] res = tree.getArray();
-
-        assertArrayEquals(new Integer[]{8, 8, 0, 0, 5, 5, 5, 3, 5, 3, 5}, res);
+        assertThrows(LightExecutionException.class, task::get);
     }
 }

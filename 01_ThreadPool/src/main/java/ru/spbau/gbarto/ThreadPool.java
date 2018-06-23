@@ -7,23 +7,23 @@ import java.util.function.Supplier;
 
 /**
  * Thread pool with fixed count of threads.
- *
- * @param <T> type of tasks result
  */
-class ThreadPool<T> {
+class ThreadPool {
 
     private int count;
-    private Queue<Task> queue;
+    private final Queue<Task> queue = new LinkedList<>();
     private Thread[] threads;
 
     /**
      * Describes the task that will be performed.
      */
-    private class Task implements LightFuture<T> {
+    private class Task<T> implements LightFuture<T> {
 
         private Supplier<T> supplier;
         private boolean ready = false;
-        private Object result;
+        private T result = null;
+        private Exception exception = null;
+        private final Object lock = new Object();
 
         private Task(Supplier<T> supplier) {
             this.supplier = supplier;
@@ -31,24 +31,30 @@ class ThreadPool<T> {
 
         @Override
         public boolean isReady() {
-            return ready;
+            synchronized (lock) {
+                return ready;
+            }
         }
 
         @Override
         public T get() throws LightExecutionException {
-            while (!isReady()) {
-                Thread.yield();
-            }
+            synchronized (lock) {
+                while (!isReady()) {
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException ignored) { }
+                }
 
-            if (result instanceof Exception) {
-                throw new LightExecutionException((Exception) result);
-            }
+                if (exception != null) {
+                    throw new LightExecutionException(exception);
+                }
 
-            return (T) result;
+                return result;
+            }
         }
 
         @Override
-        public LightFuture<T> thenApply(Function<T, T> function) {
+        public <U> LightFuture<U> thenApply(Function<T, U> function) {
             return ThreadPool.this.addTask(() -> {
                 try {
                     return function.apply(get());
@@ -59,12 +65,16 @@ class ThreadPool<T> {
         }
 
         private void run() {
-            try {
-                result = supplier.get();
-            } catch (Exception e) {
-                result = e;
+            synchronized (lock) {
+                try {
+                    result = supplier.get();
+                } catch (Exception e) {
+                    exception = e;
+                }
+                ready = true;
+
+                lock.notify();
             }
-            ready = true;
         }
     }
 
@@ -78,15 +88,22 @@ class ThreadPool<T> {
             while (!Thread.currentThread().isInterrupted()) {
                 Task task = null;
                 while (!Thread.currentThread().isInterrupted()) {
-                    while (queue.isEmpty() && !Thread.currentThread().isInterrupted()) {
-                        Thread.yield();
+                    synchronized (queue) {
+                        while (queue.isEmpty() && !Thread.currentThread().isInterrupted()) {
+                            try {
+                                queue.wait();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                break;
+                            }
+                        }
                     }
 
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
 
-                    synchronized (ThreadPool.this) {
+                    synchronized (queue) {
                         if (!queue.isEmpty()) {
                             task = queue.remove();
                             break;
@@ -110,7 +127,6 @@ class ThreadPool<T> {
      */
     ThreadPool(int count) {
         this.count = count;
-        queue = new LinkedList<>();
         threads = new Thread[count];
 
         Worker worker = new Worker();
@@ -128,9 +144,14 @@ class ThreadPool<T> {
      * @param supplier specified task to be processed
      * @return special object that stores this task and its information
      */
-    synchronized LightFuture<T> addTask(Supplier<T> supplier) {
-        Task task = new Task(supplier);
-        queue.add(task);
+    <T> LightFuture<T> addTask(Supplier<T> supplier) {
+        Task<T> task = new Task<>(supplier);
+
+        synchronized (queue) {
+            queue.add(task);
+            queue.notify();
+        }
+
         return task;
     }
 
@@ -140,6 +161,15 @@ class ThreadPool<T> {
     void shutdown() {
         for (int i = 0; i < count; i++) {
             threads[i].interrupt();
+        }
+
+        for (int i = 0; i < count; i++) {
+            while (threads[i].isAlive()) {
+                try {
+                    threads[i].join();
+                } catch (InterruptedException ignore) {
+                }
+            }
         }
     }
 }

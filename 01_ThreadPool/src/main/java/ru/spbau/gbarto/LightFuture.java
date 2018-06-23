@@ -2,6 +2,11 @@ package ru.spbau.gbarto;
 
 import java.util.function.Function;
 
+/**
+ * Stores tasks and provides interaction with thread pool.
+ *
+ * @param <T> type of result that task returns
+ */
 public interface LightFuture<T> {
 
     /**
@@ -25,14 +30,5 @@ public interface LightFuture<T> {
      * @param function for applying
      * @return the result of the task execution
      */
-    LightFuture<T> thenApply(Function<T, T> function);
-
-    /**
-     * An exception that throws if the corresponding Supplier task is completed with the exception.
-     */
-    class LightExecutionException extends Exception {
-        LightExecutionException(Exception e) {
-            super(e);
-        }
-    }
+    <U> LightFuture<U> thenApply(Function<T, U> function);
 }
