@@ -54,7 +54,7 @@ class ThreadPool {
         }
 
         @Override
-        public <U> LightFuture<U> thenApply(Function<T, U> function) {
+        public <U> LightFuture<U> thenApply(Function<? super T, U> function) {
             return ThreadPool.this.addTask(() -> {
                 try {
                     return function.apply(get());

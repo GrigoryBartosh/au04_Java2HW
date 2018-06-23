@@ -30,5 +30,5 @@ public interface LightFuture<T> {
      * @param function for applying
      * @return the result of the task execution
      */
-    <U> LightFuture<U> thenApply(Function<T, U> function);
+    <U> LightFuture<U> thenApply(Function<? super T, U> function);
 }
