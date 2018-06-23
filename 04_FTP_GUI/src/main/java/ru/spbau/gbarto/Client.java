@@ -16,6 +16,8 @@ public class Client implements Runnable {
     private Scanner input;
     private PrintWriter output;
 
+    private File fileToSave = null;
+
     /**
      * Constructs the Client.
      *
@@ -55,17 +57,16 @@ public class Client implements Runnable {
      * Gets File by the path.
      *
      * @param dataInput stream to read data
-     * @param path path to the file
+     * @param file file to be written
      * @throws IOException if any error occurred while reading data
      */
-    private void getFile(DataInputStream dataInput, String path) throws IOException {
+    private void getFile(DataInputStream dataInput, File file) throws IOException {
         long size = dataInput.readLong();
         if (size == 0) {
             return;
         }
 
-        String filename = new File(path).getName();
-        try (DataOutputStream dataOutput = new DataOutputStream(new FileOutputStream(new File(filename)))) {
+        try (DataOutputStream dataOutput = new DataOutputStream(new FileOutputStream(file))) {
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int read = dataInput.read(buffer); read != -1; read = dataInput.read(buffer)) {
                 dataOutput.write(buffer, 0, read);
@@ -95,12 +96,26 @@ public class Client implements Runnable {
                     getList(dataInput);
                     break;
                 case 2:
-                    getFile(dataInput, path);
+                    File file = fileToSave;
+                    if (file == null) {
+                        file = new File(new File(path).getName());
+                    }
+
+                    getFile(dataInput, file);
                     break;
             }
         } catch (IOException e) {
             System.err.println("error while working with server");
         }
+    }
+
+    /**
+     * Allows you to install a file in which the downloaded files will be saved.
+     *
+     * @param file file to be written
+     */
+    public void setFileToSave(File file) {
+        fileToSave = file;
     }
 
     /**

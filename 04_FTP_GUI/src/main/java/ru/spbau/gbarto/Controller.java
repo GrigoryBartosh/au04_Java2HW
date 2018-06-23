@@ -5,9 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -28,8 +30,8 @@ public class Controller {
      * Contents information about file in single line.
      */
     public static class TableFile {
-        public final SimpleStringProperty name;
-        public final SimpleStringProperty type;
+        private final SimpleStringProperty name;
+        private final SimpleStringProperty type;
 
         public TableFile(String name, boolean isFolder) {
             this.name = new SimpleStringProperty(name);
@@ -63,10 +65,14 @@ public class Controller {
      * @param request string with request content
      * @return ByteArrayOutputStream with response
      */
-    private ByteArrayOutputStream processRequest(String request) {
+    private ByteArrayOutputStream processRequest(String request, File file) {
         ByteArrayInputStream input = new ByteArrayInputStream(request.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new Client(hostName, portNumber, input, output).run();
+        Client client = new Client(hostName, portNumber, input, output);
+        if (file != null) {
+            client.setFileToSave(file);
+        }
+        client.run();
         return output;
     }
 
@@ -113,7 +119,7 @@ public class Controller {
     private void getList(String pressedName) {
         updateCurrentPath(pressedName);
 
-        ByteArrayOutputStream output = processRequest("1 " + currentPath + "\nexit");
+        ByteArrayOutputStream output = processRequest("1 " + currentPath + "\nexit", null);
         TableFile[] files = constructTableFiles(output);
         updateTableView(files);
 
@@ -126,8 +132,14 @@ public class Controller {
      * @param pressedName name of selected file
      */
     private void getFile(String pressedName) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(START_PATH));
+        fileChooser.setInitialFileName(pressedName);
+        fileChooser.setTitle("Choose where to save file");
+        File file = fileChooser.showSaveDialog(Main.getPrimaryStage());
+
         String name = Paths.get(currentPath, pressedName).toString();
-        processRequest("2 " + name + "\nexit");
+        processRequest("2 " + name + "\nexit", file);
         Main.updateTitle("file " + name + " was downloaded");
     }
 

@@ -23,6 +23,10 @@ public class Main extends Application {
         return portNumber;
     }
 
+    static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     /**
      * Updates title of primaryStage.
      *
