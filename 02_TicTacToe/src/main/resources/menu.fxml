@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="menuBox" alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.spbau.gbarto.ui.MenuController">
+
+    <Button id="hotSeat" onAction="#hotSeat" prefHeight="${menuBox.height * 0.2 * 0.6}" prefWidth="${menuBox.width * 0.8}" text="Hot seat" />
+
+    <Button id="singlePlayerEasy" onAction="#singlePlayerEasy" prefHeight="${menuBox.height * 0.2 * 0.6}" prefWidth="${menuBox.width * 0.8}" text="Single player easy" />
+
+    <Button id="singlePlayerHard" onAction="#singlePlayerHard" prefHeight="${menuBox.height * 0.2 * 0.6}" prefWidth="${menuBox.width * 0.8}" text="Single player hard" />
+
+    <Button id="statistic" onAction="#statistic" prefHeight="${menuBox.height * 0.2 * 0.6}" prefWidth="${menuBox.width * 0.8}" text="Statistic" />
+
+    <Button id="exit" onAction="#exit" prefHeight="${menuBox.height * 0.2 * 0.6}" prefWidth="${menuBox.width * 0.8}" text="Exit" />
+   <padding>
+      <Insets bottom="5.0" top="5.0" />
+   </padding>
+</VBox>
