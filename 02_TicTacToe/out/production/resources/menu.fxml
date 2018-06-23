@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.60"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ru.spbau.gbarto.ui.MenuController"
+      alignment="CENTER"
+      spacing="5">
+
+    <Button id="hotSeat"
+            text="Hot seat"
+            onAction="#hotSeat"
+            prefWidth="${singlePlayerEasy.width}"/>
+
+    <Button id="singlePlayerEasy"
+            text="Single player easy"
+            onAction="#singlePlayerEasy"
+            fx:id="singlePlayerEasy"/>
+
+    <Button id="singlePlayerHard"
+            text="Single player hard"
+            onAction="#singlePlayerHard"
+            prefWidth="${singlePlayerEasy.width}"/>
+
+    <Button id="statistic"
+            text="Statistic"
+            onAction="#statistic"
+            prefWidth="${singlePlayerEasy.width}"/>
+
+    <Button id="exit"
+            text="Exit"
+            onAction="#exit"
+            prefWidth="${singlePlayerEasy.width}"/>
+</VBox>
