@@ -9,21 +9,21 @@ import java.util.List;
 
 public class Logger {
 
-    private static List<Game> results = new ArrayList<>();
+    private List<Game> results = new ArrayList<>();
 
-    public static void add(String type, String result) {
+    public void add(String type, String result) {
         results.add(new Game(type, result));
     }
 
-    public static List<Game> getResults() {
-        return results;
+    public List<Game> getResults() {
+        return new ArrayList<>(results);
     }
 
     public static class Game {
 
-        public final SimpleStringProperty date;
-        public final SimpleStringProperty type;
-        public final SimpleStringProperty result;
+        private final SimpleStringProperty date;
+        private final SimpleStringProperty type;
+        private final SimpleStringProperty result;
 
         public Game(String type, String result) {
             date = new SimpleStringProperty(DateTimeFormatter.ofPattern("MM/dd HH:mm").format(LocalDateTime.now()));

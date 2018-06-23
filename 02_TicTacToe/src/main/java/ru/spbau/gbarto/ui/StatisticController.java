@@ -1,7 +1,6 @@
 package ru.spbau.gbarto.ui;
 
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,7 +12,7 @@ import java.io.IOException;
 
 public class StatisticController {
 
-    static void init(Stage primaryStage) throws IOException {
+    static void init(Stage primaryStage, Logger logger) throws IOException {
         primaryStage.setTitle("Tic-Tac-Toe - Statistic");
 
         FXMLLoader loader = new FXMLLoader(GameController.class.getResource("/statistic.fxml"));
@@ -25,10 +24,10 @@ public class StatisticController {
         primaryStage.setScene(scene);
 
         ObservableList<Logger.Game> data = table.getItems();
-        data.addAll(Logger.getResults());
+        data.addAll(logger.getResults());
     }
 
-    public void back(ActionEvent actionEvent) throws IOException {
+    public void back() throws IOException {
         MenuController.init();
     }
 }

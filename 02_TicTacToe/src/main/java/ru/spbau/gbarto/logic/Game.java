@@ -3,15 +3,24 @@ package ru.spbau.gbarto.logic;
 import ru.spbau.gbarto.log.Logger;
 
 public class Game {
+    private static final String GAME_TYPE = "hot seat";
 
     private static int dx[] = {-1, 0, 1, 1};
     private static int dy[] = { 1, 1, 1, 0};
 
-    GameState state;
-    CellState[][] field;
+    private String gameType = GAME_TYPE;
+
+    private GameState state;
+    private CellState[][] field;
     private boolean xTurn;
 
-    GameState calcState(CellState[][] field) {
+    private Logger logger;
+
+    void setGameType(String type) {
+        gameType = type;
+    }
+
+    GameState calcState() {
         int sumFree = 0;
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -21,9 +30,8 @@ public class Game {
                 }
 
                 for (int i = 0; i < 4; i++) {
-                    int tx, ty;
-                    tx = x + dx[i];
-                    ty = y + dy[i];
+                    int tx = x + dx[i];
+                    int ty = y + dy[i];
 
                     if (tx < 0 || tx > 2 || ty < 0 || ty > 2) {
                         continue;
@@ -54,7 +62,9 @@ public class Game {
         }
     }
 
-    public Game() {
+    public Game(Logger logger) {
+        this.logger = logger;
+
         field = new CellState[3][3];
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -73,6 +83,10 @@ public class Game {
         return field[x][y];
     }
 
+    void setCellState(int x, int y, CellState cellState) {
+        field[x][y] = cellState;
+    }
+
     public void makeMove(int x, int y) {
         if (!state.equals(GameState.PROCESS)) {
             return;
@@ -84,19 +98,17 @@ public class Game {
 
         field[x][y] = xTurn ? CellState.IS_X : CellState.IS_O;
         xTurn = !xTurn;
-        state = calcState(field);
-
-
+        state = calcState();
 
         switch (state) {
             case X_WINS:
-                Logger.add(Game.class.toString(), "X wins");
+                logger.add(gameType, "X wins");
                 break;
             case O_WINS:
-                Logger.add("hot", "O wins");
+                logger.add(gameType, "O wins");
                 break;
             case DRAW:
-                Logger.add("hot", "draw");
+                logger.add(gameType, "draw");
                 break;
         }
     }

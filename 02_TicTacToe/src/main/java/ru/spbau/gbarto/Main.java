@@ -15,6 +15,8 @@ public class Main extends Application {
         primaryStage.show();
         primaryStage.setMinWidth(300);
         primaryStage.setMinHeight(300);
+        primaryStage.setWidth(300);
+        primaryStage.setHeight(300);
 
         MenuController.init(primaryStage);
     }

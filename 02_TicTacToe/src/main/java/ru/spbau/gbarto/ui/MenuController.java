@@ -4,9 +4,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import ru.spbau.gbarto.logic.BotEasy;
-import ru.spbau.gbarto.logic.BotHard;
+import ru.spbau.gbarto.log.Logger;
+import ru.spbau.gbarto.logic.GameWithBotEasy;
+import ru.spbau.gbarto.logic.GameWithBotHard;
 import ru.spbau.gbarto.logic.Game;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.io.IOException;
 public class MenuController {
 
     private static Stage primaryStage;
+    private static Logger logger = new Logger();
 
     static void init() throws IOException {
         primaryStage.setTitle("Tic-Tac-Toe");
@@ -32,19 +35,19 @@ public class MenuController {
     }
 
     public void hotSeat() throws IOException {
-        GameController.init(primaryStage, Game.class);
+        GameController.init(primaryStage, Game.class, logger);
     }
 
     public void singlePlayerEasy() throws IOException {
-        GameController.init(primaryStage, BotEasy.class);
+        GameController.init(primaryStage, GameWithBotEasy.class, logger);
     }
 
     public void singlePlayerHard() throws IOException {
-        GameController.init(primaryStage, BotHard.class);
+        GameController.init(primaryStage, GameWithBotHard.class, logger);
     }
 
     public void statistic() throws IOException {
-        StatisticController.init(primaryStage);
+        StatisticController.init(primaryStage, logger);
     }
 
     public void exit() {

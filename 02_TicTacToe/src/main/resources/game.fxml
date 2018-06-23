@@ -6,21 +6,18 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.60"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ru.spbau.gbarto.ui.GameController"
-      prefWidth="300"
-      prefHeight="300">
-    <HBox spacing="5">
+<GridPane fx:id="gameBox" alignment="TOP_CENTER" vgap="10.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.spbau.gbarto.ui.GameController">
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Button id="back" alignment="CENTER" onAction="#back" prefWidth="${gameBox.width * 0.4}" text="Back" />
 
-            <Button alignment="CENTER" id="back" onAction="#back" prefWidth="${restart.width}" text="Back" />
-
-            <Button alignment="CENTER" id="restart" fx:id="restart" onAction="#restart" text="Restart" />
+        <Button id="restart" onAction="#restart" prefWidth="${gameBox.width * 0.4}" text="Restart" />
+      <padding>
+         <Insets bottom="15.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
     </HBox>
 
-    <GridPane fx:id="grid">
+    <GridPane fx:id="grid" alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1">
         <columnConstraints>
             <ColumnConstraints minWidth="10.0" prefWidth="50.0" />
             <ColumnConstraints minWidth="10.0" prefWidth="50.0" />
@@ -32,7 +29,11 @@
             <RowConstraints minHeight="10.0" prefHeight="50.0" />
         </rowConstraints>
     </GridPane>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-</VBox>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>

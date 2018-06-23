@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import ru.spbau.gbarto.log.Logger;
 import ru.spbau.gbarto.logic.CellState;
 import ru.spbau.gbarto.logic.Game;
 
@@ -16,9 +17,10 @@ public class GameController {
 
     private static Stage primaryStage;
     private static Class<?> gameClass;
+    private static Logger logger;
 
-    private static final BackgroundSize imgSize = new BackgroundSize(100,100,
-            true,true, true, false);
+    private static final BackgroundSize imgSize = new BackgroundSize(100, 100,
+            true, true, true, false);
 
     private static final BackgroundImage imgX = new BackgroundImage(
             new Image(GameController.class.getResourceAsStream("/cross.png")),
@@ -70,7 +72,7 @@ public class GameController {
 
         Game game;
         try {
-            game = (Game) gameClass.newInstance();
+            game = (Game) gameClass.getConstructor(Logger.class).newInstance(logger);
         } catch (Exception e) {
             System.err.println("Couldn't create the game");
             MenuController.init();
@@ -97,9 +99,10 @@ public class GameController {
         }
     }
 
-    static void init(Stage primaryStage, Class<?> gameClass) throws IOException {
+    static void init(Stage primaryStage, Class<?> gameClass, Logger logger) throws IOException {
         GameController.primaryStage = primaryStage;
         GameController.gameClass = gameClass;
+        GameController.logger = logger;
 
         init();
     }
