@@ -5,7 +5,7 @@ workspace.xml
 tasks.xml
 .gradle
 build/
-out/production/
+out/
 **/.idea/libraries/
 *.ctxt
 .mtj.tmp/

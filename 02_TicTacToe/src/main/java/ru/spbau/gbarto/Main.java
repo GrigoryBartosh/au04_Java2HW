@@ -4,6 +4,10 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import ru.spbau.gbarto.ui.MenuController;
 
+/**
+ * Tic-tac-toe graphical application.
+ * Supports single and hot seat playing mods.
+ */
 public class Main extends Application {
 
     @Override
